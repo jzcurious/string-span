@@ -57,7 +57,19 @@ class StrSpan final {
   }
 
   auto& operator[](std::size_t i) const {
-    return *(_str_begin() + i);
+    return *(begin() + i);
+  }
+
+  template <StringLike U>
+  bool operator==(const StrSpan<U>& span) const {
+    if constexpr (std::is_same_v<T, U>) {
+      if (this == &span) return true;
+      if (begin() == span.begin() and end() == span.end()) return true;
+    }
+    if (size != span.size) return false;
+    for (std::size_t i = 0; i < size; ++i)
+      if ((*this)[i] != span[i]) return false;
+    return true;
   }
 };
 

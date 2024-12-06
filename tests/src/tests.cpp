@@ -3,79 +3,79 @@
 
 using namespace strspan;
 
-TEST(String, begin) {
+TEST(begin, string) {
   std::string s = "123456789";
   StrSpan span(s);
   EXPECT_EQ(s.begin(), span.begin());
 }
 
-TEST(String, end) {
+TEST(end, string) {
   std::string s = "123456789";
   StrSpan span(s);
   EXPECT_EQ(s.end(), span.end());
 }
 
-TEST(ConstString, begin) {
+TEST(begin, const_string) {
   const std::string s = "123456789";
   StrSpan span(s);
   EXPECT_EQ(s.begin(), span.begin());
 }
 
-TEST(ConstString, end) {
+TEST(end, const_string) {
   const std::string s = "123456789";
   StrSpan span(s);
   EXPECT_EQ(s.end(), span.end());
 }
 
-TEST(CharPtr, begin) {
+TEST(begin, char_ptr) {
   char* s = "123456789";
   StrSpan span(s);
   EXPECT_EQ(s, span.begin());
 }
 
-TEST(CharPtr, end) {
+TEST(end, char_ptr) {
   char* s = "123456789";
   StrSpan span(s);
   EXPECT_EQ(s + 9, span.end());
 }
 
-TEST(ConstCharPtr, begin) {
+TEST(begin, const_char_ptr) {
   const char* s = "123456789";
   StrSpan span(s);
   EXPECT_EQ(s, span.begin());
 }
 
-TEST(ConstCharPtr, end) {
+TEST(end, const_char_ptr) {
   const char* s = "123456789";
   StrSpan span(s);
   EXPECT_EQ(s + 9, span.end());
 }
 
-TEST(CharArray, begin) {
+TEST(begin, char_array) {
   char s[] = "123456789";
   StrSpan span(s);
   EXPECT_EQ(s, span.begin());
 }
 
-TEST(CharArray, end) {
+TEST(end, char_array) {
   char s[] = "123456789";
   StrSpan span(s);
   EXPECT_EQ(s + 9, span.end());
 }
 
-TEST(ConstCharArray, begin) {
+TEST(begin, const_char_array) {
   const char s[] = "123456789";
   StrSpan span(s);
   EXPECT_EQ(s, span.begin());
 }
 
-TEST(ConstCharArray, end) {
+TEST(end, const_char_array) {
   const char s[] = "123456789";
   StrSpan span(s);
   EXPECT_EQ(s + 9, span.end());
 }
 
-TEST(String, subscript) {
+TEST(subscript, string) {
   std::string s = "123456789";
   StrSpan span(s);
   EXPECT_EQ(s[5], span[5]);
@@ -83,25 +83,25 @@ TEST(String, subscript) {
   EXPECT_EQ(s[5], span[5]);
 }
 
-TEST(ConstString, subscript) {
+TEST(subscript, const_string) {
   const std::string s = "123456789";
   StrSpan span(s);
   EXPECT_EQ(s[5], span[5]);
 }
 
-TEST(CharPtr, subscript) {
+TEST(subscript, char_ptr) {
   char* s = "123456789";
   StrSpan span(s);
   EXPECT_EQ(s[5], span[5]);
 }
 
-TEST(ConstCharPtr, subscript) {
+TEST(subscript, const_char_ptr) {
   const char* s = "123456789";
   StrSpan span(s);
   EXPECT_EQ(s[5], span[5]);
 }
 
-TEST(CharArray, subscript) {
+TEST(subscript, char_array) {
   char s[] = "123456789";
   StrSpan span(s);
   EXPECT_EQ(s[5], span[5]);
@@ -109,8 +109,43 @@ TEST(CharArray, subscript) {
   EXPECT_EQ(s[5], span[5]);
 }
 
-TEST(ConstCharArray, subscript) {
+TEST(subscript, const_char_array) {
   const char s[] = "123456789";
   StrSpan span(s);
   EXPECT_EQ(s[5], span[5]);
+}
+
+TEST(comparison, string) {
+  std::string s = "123456789";
+
+  StrSpan span1(s, 1, 4);
+  StrSpan span2(s, 1, 4);
+  StrSpan span4(s, 1, 6);
+  StrSpan span3(s, 2, 5);
+
+  EXPECT_EQ(span1, span1);
+  EXPECT_EQ(span2, span2);
+  EXPECT_EQ(span3, span3);
+
+  EXPECT_EQ(span1, span2);
+  EXPECT_NE(span1, span3);
+  EXPECT_NE(span1, span4);
+}
+
+TEST(comparison, string_const_char_ptr) {
+  std::string s1 = "123456789";
+  const char* s2 = "123456789";
+
+  StrSpan span1(s1, 1, 4);
+  StrSpan span2(s2, 1, 4);
+  StrSpan span4(s1, 1, 6);
+  StrSpan span3(s2, 2, 5);
+
+  EXPECT_EQ(span1, span1);
+  EXPECT_EQ(span2, span2);
+  EXPECT_EQ(span3, span3);
+
+  EXPECT_EQ(span1, span2);
+  EXPECT_NE(span1, span3);
+  EXPECT_NE(span1, span4);
 }
