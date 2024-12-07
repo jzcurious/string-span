@@ -3,6 +3,24 @@
 
 using namespace strspan;
 
+TEST(begin, same) {
+  std::string s = "123456789";
+
+  StrSpan span1(s);
+  StrSpan span2(span1);
+
+  EXPECT_EQ(span1.begin(), span2.begin());
+}
+
+TEST(end, same) {
+  std::string s = "123456789";
+
+  StrSpan span1(s);
+  StrSpan span2(span1);
+
+  EXPECT_EQ(span1.end(), span2.end());
+}
+
 TEST(begin, string) {
   std::string s = "123456789";
   StrSpan span(s);
@@ -115,7 +133,7 @@ TEST(subscript, const_char_array) {
   EXPECT_EQ(s[5], span[5]);
 }
 
-TEST(comparison, string) {
+TEST(comparison, same_string) {
   std::string s = "123456789";
 
   StrSpan span1(s, 1, 4);
@@ -132,7 +150,7 @@ TEST(comparison, string) {
   EXPECT_NE(span1, span4);
 }
 
-TEST(comparison, string_const_char_ptr) {
+TEST(comparison, same_string_const_char_ptr) {
   std::string s1 = "123456789";
   const char* s2 = "123456789";
 
@@ -150,12 +168,34 @@ TEST(comparison, string_const_char_ptr) {
   EXPECT_NE(span1, span4);
 }
 
+TEST(comparison, string) {
+  std::string s = "0123456789";
+  std::string s1 = "123";
+
+  StrSpan span1(s, 1, 4);
+  StrSpan span2(s, 2, 6);
+
+  EXPECT_EQ(s1, span1);
+  EXPECT_NE(s1, span2);
+}
+
+TEST(comparison, string_const_char_ptr) {
+  std::string s = "0123456789";
+  const char* s1 = "123";
+
+  StrSpan span1(s, 1, 4);
+  StrSpan span2(s, 2, 6);
+
+  EXPECT_EQ(s1, span1);
+  EXPECT_NE(s1, span2);
+}
+
 TEST(slice, string) {
   std::string s = "0123456789";
   StrSpan span(s, 1, 8);  // "1234567"
   auto sliced = span.slice(2, 4);  // "34"
 
-  EXPECT_EQ(sliced.size, 2);
+  EXPECT_EQ(sliced.size(), 2);
   EXPECT_EQ(span[2], sliced[0]);
   EXPECT_EQ(span[3], sliced[1]);
 }

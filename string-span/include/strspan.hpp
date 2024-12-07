@@ -8,7 +8,10 @@
 namespace strspan {
 
 template <class T>
-concept StringLike = std::is_convertible_v<T, std::string_view>;
+concept StrSpanKind = requires { typename T::StrSpanTrait{}; };
+
+template <class T>
+concept StringLike = std::is_convertible_v<T, std::string_view> || StrSpanKind<T>;
 
 template <class T>
 concept CharBasedString = StringLike<T> && (std::is_array_v<T> || std::is_pointer_v<T>);
@@ -38,15 +41,32 @@ class StrSpan final {
   }
 
  public:
+  struct StrSpanTrait {};
+
   const std::size_t begin_idx;
   const std::size_t end_idx;
-  const std::size_t size;
 
+ private:
+  std::size_t _size;
+
+ public:
   StrSpan(T& str, std::size_t begin_idx = 0, std::size_t end_idx = 0)
       : _str(str)
       , begin_idx(begin_idx)
       , end_idx(end_idx ? end_idx : detail::size_of_strlike(str))
-      , size(end_idx - begin_idx) {}
+      , _size(end_idx - begin_idx) {}
+
+  StrSpan(const StrSpan& span, std::size_t begin_idx = 0, std::size_t end_idx = 0)
+      : _str(span._str)
+      , begin_idx(span.begin_idx + begin_idx)
+      , end_idx(end_idx ? span.begin_idx + end_idx : span.end_idx)
+      , _size(0) {
+    _size = this->end_idx - this->begin_idx;
+  }
+
+  std::size_t size() const {
+    return _size;
+  }
 
   auto begin() const {
     return _str_begin() + begin_idx;
@@ -61,27 +81,21 @@ class StrSpan final {
   }
 
   template <StringLike U>
-  bool operator==(const StrSpan<U>& span) const {
-    if constexpr (std::is_same_v<T, U>) {
-      if (this == &span) return true;
-      if (begin() == span.begin() and end() == span.end()) return true;
+  bool operator==(const U& str) const {
+    if constexpr (std::is_same_v<std::decay_t<decltype(*this)>, U>) {
+      if (begin() == str.begin() and end() == str.end()) return true;
     }
-    if (size != span.size) return false;
-    for (std::size_t i = 0; i < size; ++i)
-      if ((*this)[i] != span[i]) return false;
+
+    if (detail::size_of_strlike(str) != _size) return false;
+
+    for (std::size_t i = 0; i < _size; ++i)
+      if ((*this)[i] != str[i]) return false;
+
     return true;
   }
 
-  // template <StringLike U>
-  // bool operator==(const U& str) const {
-  //   if (detail::size_of_strlike(str) != size) return false;
-  //   for (std::size_t i = 0; i < size; ++i)
-  //     if ((*this)[i] != str[i]) return false;
-  //   return true;
-  // }
-
   StrSpan slice(std::size_t from, std::size_t to) const {
-    return StrSpan(_str, begin_idx + from, begin_idx + to);
+    return StrSpan(*this, from, to);
   }
 };
 
