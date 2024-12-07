@@ -149,3 +149,13 @@ TEST(comparison, string_const_char_ptr) {
   EXPECT_NE(span1, span3);
   EXPECT_NE(span1, span4);
 }
+
+TEST(slice, string) {
+  std::string s = "0123456789";
+  StrSpan span(s, 1, 8);  // "1234567"
+  auto sliced = span.slice(2, 4);  // "34"
+
+  EXPECT_EQ(sliced.size, 2);
+  EXPECT_EQ(span[2], sliced[0]);
+  EXPECT_EQ(span[3], sliced[1]);
+}

@@ -71,6 +71,18 @@ class StrSpan final {
       if ((*this)[i] != span[i]) return false;
     return true;
   }
+
+  // template <StringLike U>
+  // bool operator==(const U& str) const {
+  //   if (detail::size_of_strlike(str) != size) return false;
+  //   for (std::size_t i = 0; i < size; ++i)
+  //     if ((*this)[i] != str[i]) return false;
+  //   return true;
+  // }
+
+  StrSpan slice(std::size_t from, std::size_t to) const {
+    return StrSpan(_str, begin_idx + from, begin_idx + to);
+  }
 };
 
 }  // namespace strspan
