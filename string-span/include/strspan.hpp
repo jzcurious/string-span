@@ -1,7 +1,6 @@
 #ifndef _STRSPAN_HPP_
 #define _STRSPAN_HPP_
 
-#include <concepts>
 #include <cstring>
 #include <string>
 #include <string_view>
