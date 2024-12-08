@@ -2,6 +2,7 @@
 #define _STRSPAN_HPP_
 
 #include <cstring>
+#include <string>
 #include <string_view>
 #include <type_traits>
 
@@ -28,7 +29,7 @@ std::size_t size_of_strlike(T s) {
 }  // namespace detail
 
 template <StringLike T>
-class StrSpan final {
+class StrSpan {
  private:
   T& _str;
 
@@ -38,6 +39,11 @@ class StrSpan final {
     } else {
       return _str.begin();
     }
+  }
+
+  template <class U>
+  constexpr bool _is_same_type(const U&) const {
+    return std::is_same_v<std::decay_t<decltype(*this)>, U>;
   }
 
  public:
@@ -54,7 +60,9 @@ class StrSpan final {
       : _str(str)
       , begin_idx(begin_idx)
       , end_idx(end_idx ? end_idx : detail::size_of_strlike(str))
-      , _size(end_idx - begin_idx) {}
+      , _size(0) {
+    _size = this->end_idx - this->begin_idx;
+  }
 
   StrSpan(const StrSpan& span, std::size_t begin_idx = 0, std::size_t end_idx = 0)
       : _str(span._str)
@@ -82,7 +90,7 @@ class StrSpan final {
 
   template <StringLike U>
   bool operator==(const U& str) const {
-    if constexpr (std::is_same_v<std::decay_t<decltype(*this)>, U>) {
+    if constexpr (_is_same_type(str)) {
       if (begin() == str.begin() and end() == str.end()) return true;
     }
 
@@ -97,6 +105,28 @@ class StrSpan final {
   StrSpan slice(std::size_t from, std::size_t to) const {
     return StrSpan(*this, from, to);
   }
+
+  auto& origin() const {
+    return _str;
+  }
+
+  std::string_view to_view() const {
+    if constexpr (CharBasedString<T>) {
+      return std::string_view(begin(), size());
+    } else {
+      return std::string_view(begin(), end());
+    }
+  }
+
+  std::string to_string() const {
+    if constexpr (CharBasedString<T>) {
+      return std::string(begin(), size());
+    } else {
+      return std::string(begin(), end());
+    }
+  }
+
+  // move
 };
 
 }  // namespace strspan

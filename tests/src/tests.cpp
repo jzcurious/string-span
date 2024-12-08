@@ -199,3 +199,17 @@ TEST(slice, string) {
   EXPECT_EQ(span[2], sliced[0]);
   EXPECT_EQ(span[3], sliced[1]);
 }
+
+TEST(conv, from_string) {
+  std::string s = "0123456789";
+  StrSpan span(s, 1, 8);
+
+  EXPECT_EQ(span.to_string(), span.to_view());
+}
+
+TEST(conv, from_char_string) {
+  const char* s = "0123456789";
+  StrSpan span(s, 1, 8);
+
+  EXPECT_EQ(span.to_string(), span.to_view());
+}
