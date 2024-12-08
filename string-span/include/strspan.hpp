@@ -1,6 +1,7 @@
 #ifndef _STRSPAN_HPP_
 #define _STRSPAN_HPP_
 
+#include <concepts>
 #include <cstring>
 #include <string>
 #include <string_view>
@@ -12,7 +13,10 @@ template <class T>
 concept StrSpanKind = requires { typename T::StrSpanTrait{}; };
 
 template <class T>
-concept StringLike = std::is_convertible_v<T, std::string_view> || StrSpanKind<T>;
+concept BuiltInStringKind = std::is_convertible_v<T, std::string_view>;
+
+template <class T>
+concept StringLike = BuiltInStringKind<T> || StrSpanKind<T>;
 
 template <class T>
 concept CharBasedString = StringLike<T> && (std::is_array_v<T> || std::is_pointer_v<T>);
@@ -49,27 +53,39 @@ class StrSpan {
  public:
   struct StrSpanTrait {};
 
-  const std::size_t begin_idx;
-  const std::size_t end_idx;
-
  private:
+  std::size_t _begin_idx;
+  std::size_t _end_idx;
   std::size_t _size;
 
  public:
   StrSpan(T& str, std::size_t begin_idx = 0, std::size_t end_idx = 0)
       : _str(str)
-      , begin_idx(begin_idx)
-      , end_idx(end_idx ? end_idx : detail::size_of_strlike(str))
-      , _size(0) {
-    _size = this->end_idx - this->begin_idx;
-  }
+      , _begin_idx(begin_idx)
+      , _end_idx(end_idx ? end_idx : detail::size_of_strlike(str))
+      , _size(_end_idx - _begin_idx) {}
 
   StrSpan(const StrSpan& span, std::size_t begin_idx = 0, std::size_t end_idx = 0)
       : _str(span._str)
-      , begin_idx(span.begin_idx + begin_idx)
-      , end_idx(end_idx ? span.begin_idx + end_idx : span.end_idx)
-      , _size(0) {
-    _size = this->end_idx - this->begin_idx;
+      , _begin_idx(span._begin_idx + begin_idx)
+      , _end_idx(end_idx ? span._begin_idx + end_idx : span._end_idx)
+      , _size(_end_idx - _begin_idx) {}
+
+  StrSpan& operator=(const StrSpan& span) {
+    if (this == &span) return *this;
+    _str = span._str;
+    _begin_idx = span._begin_idx;
+    _end_idx = span._end_idx;
+    _size = span._size;
+    return *this;
+  }
+
+  StrSpan& operator=(T& str) {
+    _str = str;
+    _begin_idx = 0;
+    _end_idx = detail::size_of_strlike(str);
+    _size = _end_idx;
+    return *this;
   }
 
   std::size_t size() const {
@@ -77,11 +93,11 @@ class StrSpan {
   }
 
   auto begin() const {
-    return _str_begin() + begin_idx;
+    return _str_begin() + _begin_idx;
   }
 
   auto end() const {
-    return _str_begin() + end_idx;
+    return _str_begin() + _end_idx;
   }
 
   auto& operator[](std::size_t i) const {
@@ -110,6 +126,14 @@ class StrSpan {
     return _str;
   }
 
+  std::size_t begin_idx() const {
+    return _begin_idx;
+  }
+
+  std::size_t end_idx() const {
+    return _end_idx;
+  }
+
   std::string_view to_view() const {
     if constexpr (CharBasedString<T>) {
       return std::string_view(begin(), size());
@@ -125,8 +149,6 @@ class StrSpan {
       return std::string(begin(), end());
     }
   }
-
-  // move
 };
 
 }  // namespace strspan

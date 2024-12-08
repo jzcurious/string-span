@@ -213,3 +213,48 @@ TEST(conv, from_char_string) {
 
   EXPECT_EQ(span.to_string(), span.to_view());
 }
+
+TEST(assign, string) {
+  std::string s = "0123456789";
+  std::string s1 = "9876543210";
+  StrSpan span(s1);
+
+  EXPECT_NE(span, s);
+
+  span = s;
+  EXPECT_EQ(span, s);
+}
+
+TEST(assign, const_char_ptr) {
+  const char* s = "0123456789";
+  const char* s1 = "9876543210";
+  StrSpan span(s1);
+
+  EXPECT_NE(span, s);
+
+  span = s;
+  EXPECT_EQ(span, s);
+}
+
+TEST(assign, string_view) {
+  std::string_view s = "0123456789";
+  std::string_view s1 = "9876543210";
+  StrSpan span(s1);
+
+  EXPECT_NE(span, s);
+
+  span = s;
+  EXPECT_EQ(span, s);
+}
+
+TEST(assign, same) {
+  std::string_view s1 = "0123456789";
+  std::string_view s2 = "9876543210";
+  StrSpan span1(s1);
+  StrSpan span2(s2);
+
+  EXPECT_NE(span1, span2);
+
+  span1 = span2;
+  EXPECT_EQ(span1, span2);
+}
