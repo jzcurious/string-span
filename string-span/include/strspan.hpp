@@ -133,6 +133,22 @@ class StrSpan {
     return _end_idx;
   }
 
+  void begin_idx(std::size_t idx) {
+    _begin_idx = idx;
+    _size = _end_idx - _begin_idx;
+  }
+
+  void end_idx(std::size_t idx) {
+    _end_idx = idx;
+    _size = _end_idx - _begin_idx;
+  }
+
+  void set_bounds(std::size_t begin_idx, std::size_t end_idx) {
+    _begin_idx = begin_idx;
+    _end_idx = end_idx;
+    _size = _end_idx - _begin_idx;
+  }
+
   std::string_view to_view() const {
     if constexpr (CharBasedString<T>) {
       return std::string_view(begin(), size());
