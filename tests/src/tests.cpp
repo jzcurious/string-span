@@ -259,7 +259,7 @@ TEST(assign, same) {
   EXPECT_EQ(span1, span2);
 }
 
-TEST(chaned_bounds, string) {
+TEST(change_bounds, string) {
   std::string s = "0123456789";
   StrSpan span1(s);
   StrSpan span2(s);
@@ -268,6 +268,8 @@ TEST(chaned_bounds, string) {
   span1.end_idx(6);
 
   span2.set_bounds(2, 6);
+
+  EXPECT_EQ(span1, span2);
 }
 
 TEST(empty, string) {
