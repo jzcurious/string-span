@@ -269,3 +269,13 @@ TEST(chaned_bounds, string) {
 
   span2.set_bounds(2, 6);
 }
+
+TEST(empty, string) {
+  std::string s = "0123456789";
+  StrSpan span(s);
+
+  span.begin_idx(0);
+  span.end_idx(0);
+
+  EXPECT_EQ(span.empty(), true);
+}

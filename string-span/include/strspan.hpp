@@ -164,6 +164,10 @@ class StrSpan {
       return std::string(begin(), end());
     }
   }
+
+  bool empty() const {
+    return _size == 0;
+  }
 };
 
 }  // namespace strspan
